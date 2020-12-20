@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+    #myCanvas {
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="myCanvas"></div>
+
+  <script src="../js/three-73.js"></script>
+  <script src="../js/tween.js"></script>
+  <script src="../js/dat.gui.js"></script>
+
+  <script>
+    // 创建渲染器
+    let renderer, width, height
+    function initThree() {
+      const myCanvasEl = document.getElementById('myCanvas')
+      width = myCanvasEl.clientWidth
+      height = myCanvasEl.clientHeight
+      // 创建渲染器
+      renderer = new THREE.WebGLRenderer({
+        antialias: 400
+      })
+      // 设置渲染器大小
+      renderer.setSize(width, height)
+      // 添加到页面中
+      myCanvasEl.appendChild(renderer.domElement)
+      // 设置渲染器背景颜色
+      renderer.setClearColor('#fff')
+    }
+
+    // 创建相机
+    let camera
+    function initCamera() {
+      camera = new THREE.PerspectiveCamera(45, width / height, 1, 1000)
+      // 设置相机位置
+      camera.position.x = 0
+      camera.position.y = 50
+      camera.position.z = 200
+      camera.up.x = 0
+      camera.up.y = 0
+      camera.up.z = 0
+      camera.lookAt({
+        x: 0,
+        y: 0,
+        z: 0
+      })
+    }
+
+    // 创建场景
+    let scene
+    function initScene() {
+      scene = new THREE.Scene()
+    }
+
+    // 光照
+    let light
+    function initLight() {
+      // 创建光照，颜色
+      light = new THREE.DirectionalLight(0xffffff, 1.0, 0)
+      // 设置光源位置
+      light.position.set(0, 0, 200)
+      // 向场景中添加光源
+      scene.add(light)
+    }
+
+    // 创建几何图形
+    let cube
+    function initCube() {
+      const geometry = new THREE.Geometry()
+      // 材质
+      const material = new THREE.LineBasicMaterial({
+        vertexColors: THREE.VertexColors,
+        lineWidth: 50
+      })
+      const color1 = new THREE.Color(0xff0000), color2 = new THREE.Color(0xff00ff)
+
+      // 线的材质由2点的颜色决定
+      // 设置线的两点坐标
+      const point1 = new THREE.Vector3(-50, 0, 0)
+      const point2 = new THREE.Vector3(50, 50, 0)
+      // 向几何图形中加入 两点
+      geometry.vertices.push(point1, point2)
+      geometry.colors.push(color1, color2)
+      // 创建线
+      const line = new THREE.Line(geometry, material, THREE.LineSegments)
+      // 场景中添加 线
+      scene.add(line)
+    }
+
+    // 创建 gui ui
+    let param
+    function createUI() {
+      const ParamObj = function () {
+        this.fov = 45
+      }
+      param = new ParamObj()
+      const gui = new dat.GUI()
+      gui.add(param, 'fov', 0, 180).name('视角大小')
+    }
+
+    // 改变视角大小
+    function setCameraFov() {
+      camera.fov = param.fov
+      camera.updateProjectionMatrix()
+    }
+
+    function render() {
+      setCameraFov()
+      renderer.clear()
+      renderer.render(scene, camera)
+      requestAnimationFrame(render)
+    }
+
+    (function threeStart() {
+      createUI()
+      initThree()
+      initCamera()
+      initScene()
+      initLight()
+      initCube()
+      render()
+    })()
+
+  </script>
+</body>
+</html>

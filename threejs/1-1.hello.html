@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <script src="../js/three-73.min.js"></script>
+
+  <script>
+    // 创建场景
+    const scene = new THREE.Scene()
+    // 创建相机
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000)
+    // 创建渲染器
+    const renderer = new THREE.WebGLRenderer()
+    // 设置渲染窗口大小, 三个参数, x, y, z
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    // 设置背景颜色
+    renderer.setClearColor('#ffffff')
+
+    // 将渲染添加到body中
+    document.body.appendChild(renderer.domElement)
+
+    // 创建几何体 CubeGeometry 正方形, 三个参数, 长、宽、高
+    const geometry = new THREE.CubeGeometry(2, 2, 2)
+    // 创建材料、材质
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00})
+    // 将几何体和 材质合并 成物体，可以理解为 给正方体加 属性， 颜色
+    const cube = new THREE.Mesh(geometry, material)
+
+    // 将物体 添加到场景中
+    scene.add(cube)
+
+    // 设置 相机视角距离屏幕的距离
+    camera.position.z = 5
+
+    function render() {
+      // 物体自动旋转
+      requestAnimationFrame(render)
+      // x 轴自动旋转
+      // cube.rotation.x += 0.05
+      // y轴自动旋转
+      cube.rotation.y += 0.05
+      // z轴
+      // 最终 渲染
+      renderer.render(scene, camera)
+    }
+    render()
+  </script>
+</body>
+</html>
