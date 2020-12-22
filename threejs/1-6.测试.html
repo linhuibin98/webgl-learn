@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        #myCanvas {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="myCanvas"></div>
+
+<script src="../js/three-73.js"></script>
+<script src="../js/dat.gui.js"></script>
+<script>
+    // 初始化
+    let renderer, width, height
+
+    function initThree() {
+        const myCanvasEl = document.getElementById('myCanvas')
+        width = myCanvasEl.clientWidth
+        height = myCanvasEl.clientHeight
+        renderer = new THREE.WebGLRenderer({
+            antialias: 400
+        })
+        renderer.setSize(width, height)
+        myCanvasEl.appendChild(renderer.domElement)
+        // renderer.setClearColor('#ffffff')
+    }
+
+    // 创建相机
+    let camera
+
+    function initCamera() {
+        camera = new THREE.PerspectiveCamera(45, width / height, 1, 1000)
+        camera.position.x = 0
+        camera.position.y = 400
+        camera.position.z = 450
+        camera.up.x = 0
+        camera.up.y = 1
+        camera.up.z = 0
+        camera.lookAt({
+            x: 0,
+            y: 0,
+            z: 0
+        })
+    }
+
+    // 创建场景
+    let scene
+
+    function initScene() {
+        scene = new THREE.Scene()
+    }
+
+    // 创建 光源
+    let light
+
+    function initLight() {
+        // 直射光
+        // light = new THREE.DirectionalLight('#ffffff')
+        // light.position.set(0, 50, 200)
+
+        // 点光源
+        // light = new THREE.PointLight('#ffffff')
+        // light.position.set(0, 600, 450)
+
+        // 环境光
+        // light = new THREE.AmbientLight('#ffffff')
+        // light.position.set(0, 400, 300)
+
+        // 聚光灯
+        light = new THREE.SpotLight()
+        light.position.set(0, 600, 450)
+
+        scene.add(light)
+    }
+
+    // 创建网格
+    function initGrid() {
+        const material = new THREE.LineBasicMaterial({
+            color: '#ffffff'
+        })
+        let start = 200, end = -200
+        for (; start >= end; start -= 5) {
+            console.log('start===', start)
+            const geometry1 = new THREE.Geometry()
+            const point1 = new THREE.Vector3(200, 0, start)
+            const point2 = new THREE.Vector3(-200, 0, start)
+            const geometry2 = new THREE.Geometry()
+            const point3 = new THREE.Vector3(start, 0, 200)
+            const point4 = new THREE.Vector3(start, 0, -200)
+            geometry1.vertices.push(point1, point2)
+            geometry2.vertices.push(point3, point4)
+            const line1 = new THREE.Line(geometry1, material)
+            const line2 = new THREE.Line(geometry2, material)
+            scene.add(line1)
+            scene.add(line2)
+        }
+    }
+
+    // 创建 几何体
+    let cube
+
+    function initCube() {
+        const geometry = new THREE.CubeGeometry(50, 50, 50)
+        const material = new THREE.MeshPhongMaterial({
+            color: '#00ff00',
+            opacity: 0.75,
+            specular: '#00ff00'
+        })
+        cube = new THREE.Mesh(geometry, material)
+        cube.position.y = 100
+        scene.add(cube)
+    }
+
+    // 创建 gui ui
+    let param
+    function createUI() {
+        const ParamObj = function () {
+            this.fov = 45
+            this.positionX = 0
+            this.positionY = 400
+            this.positionZ = 450
+        }
+        param = new ParamObj()
+        const gui = new dat.GUI()
+        gui.add(param, 'fov', 0, 180).name('视角大小')
+        gui.add(param, 'positionX', 0, 1000).name('相机位置x')
+        gui.add(param, 'positionY', 0, 1000).name('相机位置y')
+        gui.add(param, 'positionZ', 0, 1000).name('相机位置z')
+    }
+
+    // 改变视角大小
+    function setCameraParams() {
+        camera.fov = param.fov
+        camera.position.x = param.positionX
+        camera.position.y = param.positionY
+        camera.position.z = param.positionZ
+        camera.updateProjectionMatrix()
+    }
+
+    // 渲染
+    let time = 0
+    function render() {
+        cube.rotation.y += 0.02
+        cube.rotation.z += 0.02
+        camera.position.x = param.positionX += 400 * Math.cos( Math.PI * time );
+        camera.position.z = param.positionZ += 400 * Math.sin( Math.PI * time );
+        setCameraParams()
+        renderer.render(scene, camera)
+        time++
+        requestAnimationFrame(render)
+    }
+
+    // 开始
+    (function initStart() {
+        initThree()
+        initCamera()
+        initScene()
+        initLight()
+        initGrid()
+        initCube()
+        createUI()
+        render()
+    })()
+
+</script>
+</body>
+</html>
